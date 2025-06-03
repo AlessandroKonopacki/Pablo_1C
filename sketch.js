@@ -8,14 +8,10 @@ let alimentosColetados = 0;
 let estadoJogo = "jogando"; // "jogando", "ganhou", "perdeu"
 
 function preload() {
-  cidadeImg = loadImage(
-    'img/cidade.png');
-  campoImg = loadImage(
-    'img/campo.png');
-  ponteImg = loadImage(
-   'img/ponte.png');
-  caminhaoImg = loadImage(
-    'img/caminhao.png');
+  cidadeImg = loadImage('img/cidade.png');
+  campoImg = loadImage('img/campo.png');
+  ponteImg = loadImage('img/ponte.png');
+  caminhaoImg = loadImage('img/caminhao.png');
 }
 
 function setup() {
