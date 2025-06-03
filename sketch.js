@@ -67,7 +67,7 @@ function moverJogador() {
     scrollX -= jogador.velocidade; // anda para frente
   }
   if (keyIsDown(LEFT_ARROW)) {
-    scrollX += jogador.velocidade; // ré
+    scrollX -= jogador.velocidade; // ré
   }
 }
 
