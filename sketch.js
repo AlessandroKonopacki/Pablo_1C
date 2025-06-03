@@ -9,17 +9,13 @@ let estadoJogo = "jogando"; // "jogando", "ganhou", "perdeu"
 
 function preload() {
   cidadeImg = loadImage(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Urban_landscape.svg/800px-Urban_landscape.svg.png"
-  );
+    'img/cidade.png');
   campoImg = loadImage(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Farmland_Landscape.svg/800px-Farmland_Landscape.svg.png"
-  );
+    'img/campo.png');
   ponteImg = loadImage(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bridge_icon.svg/100px-Bridge_icon.svg.png"
-  );
+   'img/ponte.png');
   caminhaoImg = loadImage(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Truck_icon.svg/120px-Truck_icon.svg.png"
-  );
+    'img/caminhao.png');
 }
 
 function setup() {
