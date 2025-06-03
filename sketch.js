@@ -2,8 +2,10 @@ let jogador;
 let obstaculos = [];
 let scrollX = 0;
 let estadoJogo = "jogando";
-let carregando = false;
+let alimentosNoCaminhao = 0;
+let maxAlimentos = 3;
 let entregas = 0;
+
 let coleta = { x: 100, y: 300, raio: 25 };
 let entrega = { x: 2000, y: 300, raio: 25 };
 
@@ -13,6 +15,7 @@ function setup() {
     x: 100,
     y: height / 2,
     raio: 20,
+    velocidadeBase: 3,
     velocidade: 3,
   };
 
@@ -26,11 +29,11 @@ function setup() {
 }
 
 function draw() {
-  // Fundo: muda conforme posição
+  // Fundo: campo ou cidade
   if (-scrollX < 1200) {
     background(200, 240, 200); // campo
   } else {
-    background(180); // cidade/asfalto
+    background(180); // cidade
   }
 
   drawChao();
@@ -43,20 +46,31 @@ function draw() {
   drawPontos();
   verificarColisoes();
   verificarColetaEntrega();
-
   mostrarInfo();
 }
 
 function moverJogador() {
   if (keyIsDown(UP_ARROW)) jogador.y -= jogador.velocidade;
   if (keyIsDown(DOWN_ARROW)) jogador.y += jogador.velocidade;
-
   jogador.y = constrain(jogador.y, 0, height - jogador.raio * 2);
+
+  // Acelerar com SHIFT
+  if (keyIsDown(SHIFT)) {
+    jogador.velocidade = jogador.velocidadeBase * 2;
+  } else {
+    jogador.velocidade = jogador.velocidadeBase;
+  }
 }
 
 function drawJogador() {
-  fill(carregando ? 'orange' : 'blue');
+  fill(alimentosNoCaminhao > 0 ? 'orange' : 'blue');
   ellipse(jogador.x, jogador.y, jogador.raio * 2);
+
+  // Mostrar contador de alimentos
+  fill(255);
+  textSize(12);
+  textAlign(CENTER);
+  text(alimentosNoCaminhao, jogador.x, jogador.y + 4);
 }
 
 function drawObstaculos() {
@@ -67,19 +81,17 @@ function drawObstaculos() {
 }
 
 function drawChao() {
-  fill(-scrollX < 1200 ? '#a0522d' : '#404040'); // estrada de terra ou asfalto
+  fill(-scrollX < 1200 ? '#a0522d' : '#404040');
   rect(0, height - 50, width, 50);
 }
 
 function drawPontos() {
-  // Ponto de coleta
   fill('green');
   ellipse(coleta.x + scrollX, coleta.y, coleta.raio * 2);
-  textAlign(CENTER);
   fill(0);
+  textAlign(CENTER);
   text("Coleta", coleta.x + scrollX, coleta.y - 20);
 
-  // Ponto de entrega
   fill('red');
   ellipse(entrega.x + scrollX, entrega.y, entrega.raio * 2);
   fill(0);
@@ -90,13 +102,21 @@ function verificarColetaEntrega() {
   let cx = jogador.x;
   let cy = jogador.y;
 
-  if (!carregando && colisaoCirculoCirculo(cx, cy, jogador.raio, coleta.x + scrollX, coleta.y, coleta.raio)) {
-    carregando = true;
+  // Coletar
+  if (
+    alimentosNoCaminhao < maxAlimentos &&
+    colisaoCirculoCirculo(cx, cy, jogador.raio, coleta.x + scrollX, coleta.y, coleta.raio)
+  ) {
+    alimentosNoCaminhao++;
   }
 
-  if (carregando && colisaoCirculoCirculo(cx, cy, jogador.raio, entrega.x + scrollX, entrega.y, entrega.raio)) {
-    carregando = false;
-    entregas++;
+  // Entregar
+  if (
+    alimentosNoCaminhao > 0 &&
+    colisaoCirculoCirculo(cx, cy, jogador.raio, entrega.x + scrollX, entrega.y, entrega.raio)
+  ) {
+    entregas += alimentosNoCaminhao;
+    alimentosNoCaminhao = 0;
   }
 }
 
@@ -123,6 +143,8 @@ function mostrarInfo() {
   textSize(16);
   textAlign(LEFT);
   text(`Entregas: ${entregas}`, 20, 30);
+  text(`Caminhão: ${alimentosNoCaminhao}/${maxAlimentos}`, 20, 50);
+
   if (estadoJogo === "perdeu") {
     fill(255, 0, 0);
     textSize(32);
