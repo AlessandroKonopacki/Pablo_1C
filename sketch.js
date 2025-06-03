@@ -64,10 +64,10 @@ function moverJogador() {
 
   // Movimento horizontal controlado
   if (keyIsDown(RIGHT_ARROW)) {
-    scrollX -= jogador.velocidade; // anda para frente
+    scrollX += jogador.velocidade; // anda para frente
   }
   if (keyIsDown(LEFT_ARROW)) {
-    scrollX += jogador.velocidade.**-1; // ré
+    scrollX -= jogador.velocidade; // ré
   }
 }
 
