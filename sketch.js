@@ -50,15 +50,24 @@ function draw() {
 }
 
 function moverJogador() {
+  // movimentação vertical
   if (keyIsDown(UP_ARROW)) jogador.y -= jogador.velocidade;
   if (keyIsDown(DOWN_ARROW)) jogador.y += jogador.velocidade;
   jogador.y = constrain(jogador.y, 0, height - jogador.raio * 2);
 
-  // Acelerar com SHIFT
+  // Aceleração com SHIFT
   if (keyIsDown(SHIFT)) {
     jogador.velocidade = jogador.velocidadeBase * 2;
   } else {
     jogador.velocidade = jogador.velocidadeBase;
+  }
+
+  // Movimento horizontal controlado
+  if (keyIsDown(RIGHT_ARROW)) {
+    scrollX -= jogador.velocidade; // anda para frente
+  }
+  if (keyIsDown(LEFT_ARROW)) {
+    scrollX += jogador.velocidade; // ré
   }
 }
 
