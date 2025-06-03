@@ -20,7 +20,6 @@ function preload() {
 
 function setup() {
   createCanvas(800, 400);
-
   jogador = {
     x: 50,
     y: height / 2,
