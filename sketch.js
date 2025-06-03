@@ -3,7 +3,7 @@ let obstaculos = [];
 let scrollX = 0;
 let estadoJogo = "jogando";
 let alimentosNoCaminhao = 0;
-let maxAlimentos = 3;
+let maxAlimentos = 10;
 let entregas = 0;
 
 let coleta = { x: 100, y: 300, raio: 25 };
@@ -23,7 +23,7 @@ function setup() {
     obstaculos.push({
       x: random(400, 2200),
       y: random(60, height - 60),
-      raio: 20,
+      raio: random,
     });
   }
 }
@@ -140,6 +140,20 @@ function verificarColisoes() {
   }
 }
 
+// Verifica se o jogador chegou à cidade para entregar
+if (jogador.x + scrollX > cidadeX) {
+  if (jogador.carga > 0) {
+    alimentosEntregues += jogador.carga;
+    jogador.carga = 0;
+
+    if (alimentosEntregues >= totalAlimentos) {
+      estadoJogo = "ganhou";
+    }
+  } else {
+    estadoJogo = "perdeu";
+  }
+}
+
 function colisaoCirculoCirculo(x1, y1, r1, x2, y2, r2) {
   let dx = x1 - x2;
   let dy = y1 - y2;
@@ -162,6 +176,24 @@ function mostrarInfo() {
     textSize(16);
     text("Pressione ESPAÇO para reiniciar", width / 2, height / 2 + 40);
   }
+}
+
+if (estadoJogo === "ganhou") {
+  fill(0, 200, 0, 220);
+  rect(width / 4, height / 3, width / 2, 100, 10);
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text("Você entregou todos os alimentos!", width / 2, height / 2);
+  noLoop();
+} else if (estadoJogo === "perdeu") {
+  fill(200, 0, 0, 220);
+  rect(width / 4, height / 3, width / 2, 100, 10);
+  fill(255);
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  text("Você chegou sem alimentos!", width / 2, height / 2);
+  noLoop();
 }
 
 function keyPressed() {
