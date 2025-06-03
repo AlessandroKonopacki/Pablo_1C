@@ -1,142 +1,98 @@
 let jogador;
-let alimentos = [];
 let obstaculos = [];
-let pontes = [];
 let scrollX = 0;
-let estadoJogo = "jogando";
-let alimentosColetados = 0;
-let pontesConstruidas = 0;
+let estadoJogo = "jogando"; // "jogando", "perdeu"
 
 function setup() {
   createCanvas(800, 400);
 
   jogador = {
-    x: 50,
+    x: 100,
     y: height / 2,
-    largura: 40,
-    altura: 40,
-    velocidade: 4,
-    carregando: false,
+    raio: 20,
+    velocidade: 3,
   };
 
-  for (let i = 0; i < 5; i++) {
-    alimentos.push({
-      x: random(200, 2000),
-      y: random(50, height - 50),
-      tipo: floor(random(3)),
-      coletado: false,
-    });
-  }
-
-  for (let i = 0; i < 4; i++) {
+  // Gera obstáculos aleatórios no "mundo"
+  for (let i = 0; i < 10; i++) {
     obstaculos.push({
-      x: random(300, 2000),
-      y: random(80, height - 80),
-      raio: 25,
+      x: random(400, 2000),
+      y: random(50, height - 50),
+      raio: 20,
     });
   }
 }
 
 function draw() {
-  background(180, 220, 255); // céu azul claro
+  background(180, 220, 255); // céu
+  drawChao();
 
-  push();
-  translate(-scrollX, 0);
+  if (estadoJogo === "jogando") {
+    moverJogador();
+    scrollX -= jogador.velocidade;
 
-  drawGround();
+    drawObstaculos();
+    drawJogador();
+    verificarColisoes();
 
-  // Obstáculos (pedras pretas)
-  for (let o of obstaculos) {
     fill(0);
-    ellipse(o.x, o.y, o.raio * 2);
-  }
-
-  // Alimentos
-  for (let a of alimentos) {
-    if (!a.coletado) {
-      if (a.tipo === 0) fill(255, 0, 0);
-      else if (a.tipo === 1) fill(0, 255, 0);
-      else fill(210, 180, 140);
-      ellipse(a.x, a.y, 20);
-    }
-  }
-
-  // Jogador (caixa)
-  fill(255, 150, 0);
-  rect(jogador.x, jogador.y, jogador.largura, jogador.altura);
-
-  pop();
-
-  // Movimentação
-  if (keyIsDown(LEFT_ARROW)) jogador.x -= jogador.velocidade;
-  if (keyIsDown(RIGHT_ARROW)) jogador.x += jogador.velocidade;
-  if (keyIsDown(UP_ARROW)) jogador.y -= jogador.velocidade;
-  if (keyIsDown(DOWN_ARROW)) jogador.y += jogador.velocidade;
-
-  jogador.y = constrain(jogador.y, 0, height - jogador.altura);
-
-  scrollX = jogador.x - 100;
-
-  // Coleta de alimentos
-  if (!jogador.carregando) {
-    for (let a of alimentos) {
-      if (!a.coletado && dist(jogador.x + jogador.largura / 2 + scrollX, jogador.y + jogador.altura / 2, a.x, a.y) < 25) {
-        a.coletado = true;
-        jogador.carregando = true;
-        break;
-      }
-    }
-  }
-
-  // Colisão com obstáculos
-  for (let o of obstaculos) {
-    let dx = jogador.x + jogador.largura / 2 + scrollX - o.x;
-    let dy = jogador.y + jogador.altura / 2 - o.y;
-    let distancia = sqrt(dx * dx + dy * dy);
-    if (distancia < o.raio + jogador.largura / 2) {
-      estadoJogo = "perdeu";
-    }
-  }
-
-  // Entregar alimento
-  if (jogador.carregando && jogador.x + scrollX > 2000) {
-    jogador.carregando = false;
-    alimentosColetados++;
-
-    if (alimentos.every(a => a.coletado)) {
-      estadoJogo = "ganhou";
-    }
-  }
-
-  // Interface
-  fill(0);
-  textSize(16);
-  text(`Alimentos entregues: ${alimentosColetados}`, 20, 30);
-
-  if (estadoJogo === "ganhou") {
-    fill(0, 200, 0, 200);
-    rect(width / 4, height / 3, width / 2, 100);
-    fill(255);
-    textSize(32);
-    textAlign(CENTER, CENTER);
-    text("Parabéns! Você venceu!", width / 2, height / 2);
-    noLoop();
+    textSize(16);
+    text(`Distância percorrida: ${-scrollX}px`, 20, 30);
   } else if (estadoJogo === "perdeu") {
     fill(200, 0, 0, 200);
     rect(width / 4, height / 3, width / 2, 100);
     fill(255);
     textSize(32);
     textAlign(CENTER, CENTER);
-    text("Você colidiu com uma pedra!", width / 2, height / 2);
+    text("Caminhão colidiu com uma pedra!", width / 2, height / 2);
     textSize(16);
-    text("Pressione ESPAÇO para tentar novamente", width / 2, height / 2 + 30);
+    text("Pressione ESPAÇO para recomeçar", width / 2, height / 2 + 30);
     noLoop();
   }
 }
 
-function drawGround() {
+function moverJogador() {
+  if (keyIsDown(UP_ARROW)) jogador.y -= jogador.velocidade;
+  if (keyIsDown(DOWN_ARROW)) jogador.y += jogador.velocidade;
+
+  jogador.y = constrain(jogador.y, 0, height - jogador.raio * 2);
+}
+
+function drawJogador() {
+  fill(0, 100, 255);
+  ellipse(jogador.x, jogador.y, jogador.raio * 2);
+}
+
+function drawObstaculos() {
+  fill(50);
+  for (let o of obstaculos) {
+    ellipse(o.x + scrollX, o.y, o.raio * 2);
+  }
+}
+
+function drawChao() {
   fill(100, 200, 100);
-  rect(0, height - 50, 3000, 50); // chão verde
+  rect(0, height - 50, width, 50);
+}
+
+function verificarColisoes() {
+  for (let o of obstaculos) {
+    let cx = jogador.x;
+    let cy = jogador.y;
+    let ox = o.x + scrollX;
+    let oy = o.y;
+
+    if (colisaoCirculoCirculo(cx, cy, jogador.raio, ox, oy, o.raio)) {
+      estadoJogo = "perdeu";
+    }
+  }
+}
+
+function colisaoCirculoCirculo(x1, y1, r1, x2, y2, r2) {
+  let dx = x1 - x2;
+  let dy = y1 - y2;
+  let distancia = sqrt(dx * dx + dy * dy);
+  return distancia < r1 + r2;
 }
 
 function keyPressed() {
