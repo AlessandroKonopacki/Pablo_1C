@@ -23,7 +23,7 @@ function setup() {
     obstaculos.push({
       x: random(400, 2200),
       y: random(60, height - 60),
-      raio: random,
+      raio: 30,
     });
   }
 }
